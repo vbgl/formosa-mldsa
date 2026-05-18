@@ -29,14 +29,15 @@ inline fn __sign_internal(
     stack u32[N] polynomial0 polynomial1;
 
     reg u32 status;
-    reg u32 pos m mlen ctx ctxlen t;
+    reg u32 pos m mlen ctx t;
+    #[spill] reg u32 ctxlen;
     reg u32 continue nonce;
     reg u32 check_norm bound;
     reg u32 randomness_ptr idx;
-    reg u32 hints total_hints;
-    reg u32 hints_written;
+    #[spill] reg u32 hints total_hints;
+    #[spill] reg u32 hints_written;
     reg u32 row_number_reg;
-    reg u32 iteration_number;
+    #[spill] reg u32 iteration_number;
 
     inline int i;
     inline int row_number column_number;
@@ -46,7 +47,7 @@ inline fn __sign_internal(
     ctxlen = ctxlen_mlen[0];
 
     if (ctxlen <= 255) {
-        () = #spill(ctx_m_rand, sig, status, ctxlen, ctxlen_mlen, signing_key);
+        () = #spill(ctx_m_rand, sig, status, ctxlen_mlen, signing_key);
 
         pstate = state;
 
@@ -63,7 +64,6 @@ inline fn __sign_internal(
         () = #unspill(ctx_m_rand);
         ctx = ctx_m_rand[0];
 
-        () = #unspill(ctxlen);
         pstate, pos = _shake256_inc_absorb_mem_naive(pstate, pos, ctx, ctxlen);
 
         () = #unspill(ctxlen_mlen);
@@ -109,9 +109,7 @@ inline fn __sign_internal(
         iteration_number = -1;
         () = #spill(iteration_number);
         while {
-            () = #unspill(iteration_number);
             iteration_number += 1;
-            () = #spill(iteration_number);
 
             for row_number = 0 to K {
                 w_compressed[row_number * COMPRESSED_W_ELEMENT_SIZE_WITH_PADDING : COMPRESSED_W_ELEMENT_SIZE_WITH_PADDING] =
@@ -120,7 +118,6 @@ inline fn __sign_internal(
             }
 
             for column_number = 0 to L {
-                () = #unspill(iteration_number);
                 nonce = L;
                 nonce *= iteration_number;
                 nonce += column_number;
@@ -215,7 +212,6 @@ inline fn __sign_internal(
 
                     nonce = L;
 
-                    () = #unspill(iteration_number);
                     nonce *= iteration_number;
                     nonce += column_number;
                     polynomial1 = _poly_uniform_gamma1(polynomial1, rhoprime, nonce);
@@ -276,7 +272,6 @@ inline fn __sign_internal(
                 } else {
                     total_hints = 0;
                     hints_written = 0;
-                    () = #spill(total_hints, hints_written);
 
                     for row_number = 0 to K {
                         if (check_norm == 0) {
@@ -296,11 +291,9 @@ inline fn __sign_internal(
                                 #[declassify] w_compressed = w_compressed;
                                 polynomial0, hints = _poly_make_hint_inplace(polynomial0, w_compressed[row_number *  COMPRESSED_W_ELEMENT_SIZE_WITH_PADDING : COMPRESSED_W_ELEMENT_SIZE_WITH_PADDING]);
 
-                                () = #unspill(total_hints);
                                 total_hints += hints;
-                                () = #spill(total_hints);
                                 if (total_hints <= MAX_ONES_IN_HINT) {
-                                    () = #unspill(hints_written, sig);
+                                    () = #unspill(sig);
                                     row_number_reg = row_number;
                                     sig[START_OF_HINT_IN_SIGNATURE : HINT_ENCODED_SIZE], hints_written = _pack_hint_element(
                                         sig[START_OF_HINT_IN_SIGNATURE : HINT_ENCODED_SIZE],
@@ -308,13 +301,12 @@ inline fn __sign_internal(
                                         hints_written,
                                         row_number_reg
                                     );
-                                    () = #spill(hints_written, sig);
+                                    () = #spill(sig);
                                 }
                             }
                         }
                     }
 
-                    () = #unspill(total_hints);
                     if (check_norm != 0) {
                         continue = 1;
                     } else if (total_hints > MAX_ONES_IN_HINT) {
@@ -325,7 +317,6 @@ inline fn __sign_internal(
                         // Finish writing out to the encoded hint by zeroing
                         // the rest of the elements.
                         idx = START_OF_HINT_IN_SIGNATURE;
-                        () = #unspill(hints_written);
                         idx += hints_written;
 
                         () = #unspill(sig);

@@ -272,7 +272,8 @@ fn _hash_verification_key(
     reg ptr u8[VERIFICATION_KEY_SIZE] verification_key
 ) -> reg ptr u32[25 * 2]
 {
-    reg u32 vk_offset state_offset;
+    #[spill] reg u32 vk_offset;
+    reg u32 state_offset;
     reg u32 vk_word state_word;
     reg u32 last;
 
@@ -295,9 +296,9 @@ fn _hash_verification_key(
             state[state_offset] = state_word;
             state_offset += 1;
         }
-        () = #spill(vk_offset, verification_key);
+        () = #spill(verification_key);
         state = _keccakf1600_ref(state);
-        () = #unspill(vk_offset, verification_key);
+        () = #unspill(verification_key);
     }
 
     state_offset = 0;
@@ -326,7 +327,7 @@ inline fn __derive_commitment_hash
 ) -> reg ptr u32[25*2], reg u32
 {
     reg u32 t s;
-    reg u32 ctr;
+    #[spill] reg u32 ctr;
     ctr = 0;
 
     // While input is not consumed :
@@ -340,9 +341,9 @@ inline fn __derive_commitment_hash
         pstate[:u8 pos] = s;
         pos += 1; ctr += 1;
         if (pos == SHAKE256_RATE) {
-            () = #spill(ctr, pos, m);
+            () = #spill(pos, m);
             pstate = _keccakf1600_ref(pstate);
-            () = #unspill(ctr, pos, m);
+            () = #unspill(pos, m);
             pos = 0;
         }
     }
@@ -358,7 +359,7 @@ fn _shake256_absorb_w1_element
 ) -> reg ptr u32[25*2], reg u32
 {
     reg u32 t s;
-    reg u32 ctr;
+    #[spill] reg u32 ctr;
     ctr = 0;
 
     // While input is not consumed :
@@ -374,9 +375,9 @@ fn _shake256_absorb_w1_element
 
         if (pos == SHAKE256_RATE) {
             pos = 0;
-            () = #spill(ctr, pos, w1_element);
+            () = #spill(pos, w1_element);
             pstate = _keccakf1600_ref(pstate);
-            () = #unspill(ctr, pos, w1_element);
+            () = #unspill(pos, w1_element);
         }
     }
 

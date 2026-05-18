@@ -366,7 +366,8 @@ fn _poly_generate_challenge(
     reg u32[2] signs;
     stack u32[2] s_signs;
 
-    reg u32 aux, pos, i;
+    #[spill] reg u32 pos;
+    reg u32 aux, i;
     signs[0] = state[:u32 0];
     signs[1] = state[:u32 1];
 
@@ -379,7 +380,7 @@ fn _poly_generate_challenge(
         i += 1;
     }
 
-    reg u32 j;
+    #[spill] reg u32 j;
     j = N - TAU;
     reg u32 b;
     while (j < N) {
@@ -387,11 +388,11 @@ fn _poly_generate_challenge(
             if (pos >= SHAKE256_RATE) {
                 pos = 0;
 
-                () = #spill(j, challenge, pos);
+                () = #spill(challenge);
                 s_signs = #copy(signs);
                 state = _keccakf1600_ref(state);
 
-                () = #unspill(j, challenge, pos);
+                () = #unspill(challenge);
                 signs = #copy(s_signs);
             }
 
@@ -690,6 +691,7 @@ fn _poly_compute_A_times_polynomial(
 ) -> reg ptr u8[COMPRESSED_W_ELEMENT_SIZE_WITH_PADDING],
      reg ptr u32[25 * 2]
 {
+    #[spill]
     reg u32 sampled;
     reg u32 xof_offset;
     reg u32 coeff mask;
@@ -702,9 +704,7 @@ fn _poly_compute_A_times_polynomial(
 
     sampled = 0;
     while (sampled < N) {
-        () = #spill(sampled);
         xof_state = _keccakf1600_ref(xof_state);
-        () = #unspill(sampled);
         xof_offset = 0;
         while (xof_offset < SHAKE128_RATE) {
             if (sampled < N) {
