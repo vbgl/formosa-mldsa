@@ -8,7 +8,7 @@ inline fn __add_seed_ref(
     i = 0;
     while ( i < SEEDBYTES / 4 )
     {
-        t0 = in[:u32 i];
+        t0 = in[#unaligned:u32 i];
         state[i] = t0;
         i += 1;
     }
@@ -25,7 +25,7 @@ inline fn __add_crh(
     i = 0;
     while (i < CRHBYTES / 4)
     {
-        t0 = in[:u32 i];
+        t0 = in[#unaligned:u32 i];
         state[i] = t0;
         i += 1;
     }
@@ -169,7 +169,7 @@ inline fn __add_commitment_hash(
     i = 0;
     while (i < COMMITMENT_HASH_SIZE / 4)
     {
-        t0 = in[:u32 i];
+        t0 = in[#unaligned:u32 i];
         state[i] = t0;
         i += 1;
     }
@@ -286,7 +286,7 @@ fn _hash_verification_key(
     {
         state_offset = 0;
         while (state_offset < SHAKE256_RATE >> 2) {
-            vk_word = verification_key[:u32 vk_offset];
+            vk_word = verification_key[#unaligned:u32 vk_offset];
             vk_offset += 1;
 
             state_word = state[state_offset];
@@ -302,7 +302,7 @@ fn _hash_verification_key(
 
     state_offset = 0;
     while(vk_offset < VERIFICATION_KEY_SIZE >> 2) {
-        vk_word = verification_key[:u32 vk_offset];
+        vk_word = verification_key[#unaligned:u32 vk_offset];
         vk_offset += 1;
 
         state_word = state[state_offset];
