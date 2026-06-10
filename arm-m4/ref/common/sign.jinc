@@ -207,12 +207,11 @@ fn _crypto_sign_signature_ctx_seed(
             commitment_hash = sig[0:COMMITMENT_HASH_SIZE];
             for i = 0 to COMMITMENT_HASH_SIZE/4 {
                 t = pstate[i];
-                commitment_hash[:u32 i] = t;
+                commitment_hash[#unaligned:u32 i] = t;
             }
             state = pstate;
             sig[0:COMMITMENT_HASH_SIZE] = commitment_hash;
 
-            #spill(sig);
             cp = s_cp;
 
             #declassify(commitment_hash);

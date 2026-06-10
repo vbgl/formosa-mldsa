@@ -9,7 +9,7 @@ inline fn __add_seed_ref(reg ptr u32[25*2] state,
     i = 0;
     while ( i < inlen4 )
     {
-        t0 = in[:u32 i];
+        t0 = in[#unaligned:u32 i];
         state[i] = t0;
         i += 1;
     }
@@ -46,7 +46,7 @@ inline fn __add_ctilde_ref(reg ptr u32[25*2] state,
     i = 0;
     while ( i < inlen4 )
     {
-        t0 = in[:u32 i];
+        t0 = in[#unaligned:u32 i];
         state[i] = t0;
         i += 1;
     }
@@ -314,7 +314,7 @@ fn _hash_verification_key(
     {
         j = 0;
         while (j < SHAKE256_RATE >> 2) {
-            t = inp[:u32 i];
+            t = inp[#unaligned:u32 i];
             s = pstate[j];
             t ^= s;
             pstate[j] = t;
@@ -328,7 +328,7 @@ fn _hash_verification_key(
 
     j = 0;
     while(i < VERIFICATION_KEY_SIZE >> 2) {
-        t = inp[:u32 i];
+        t = inp[#unaligned:u32 i];
         s = pstate[j];
         t ^= s;
         pstate[j] = t;
