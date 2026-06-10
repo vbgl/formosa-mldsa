@@ -29,16 +29,16 @@ namespace matrix_A {
 
         for i = 0 to 4
         {
-            t64 = rho[:u64 i];
+            t64 = rho[#unaligned:u64 i];
             state[:u64 4 * i] ^= t64;
 
-            t64 = rho[:u64 i];
+            t64 = rho[#unaligned:u64 i];
             state[:u64 4 * i + 1] ^= t64;
 
-            t64 = rho[:u64 i];
+            t64 = rho[#unaligned:u64 i];
             state[:u64 4 * i + 2] ^= t64;
 
-            t64 = rho[:u64 i];
+            t64 = rho[#unaligned:u64 i];
             state[:u64 4 * i + 3] ^= t64;
         }
 
