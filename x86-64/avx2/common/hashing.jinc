@@ -184,10 +184,10 @@ fn __derive_message_representative(
     context_offset = 0;
 
     #unspill(context_message_pointers);
-    context = context_message_pointers[0];
+    context = context_message_pointers[#unaligned 0];
 
     #unspill(context_message_sizes);
-    context_size = context_message_sizes[0];
+    context_size = context_message_sizes[#unaligned 0];
 
     // We first need to absorb `0 || context_size` before absorbing the context.
     state.[:u8 64] = 0;
@@ -214,10 +214,10 @@ fn __derive_message_representative(
     message_offset = 0;
 
     #unspill(context_message_pointers);
-    message = context_message_pointers[1];
+    message = context_message_pointers[#unaligned 1];
 
     #unspill(context_message_sizes);
-    message_size = context_message_sizes[1];
+    message_size = context_message_sizes[#unaligned 1];
 
     while(message_offset < message_size) {
         if (state_offset >= SHAKE256_RATE) {

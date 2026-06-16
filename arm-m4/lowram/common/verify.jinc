@@ -50,7 +50,7 @@ inline fn __verify_internal(
     reg u32 observed expected;
     reg u32 j;
 
-    ctxlen = ctxlen_mlen[0];
+    ctxlen = ctxlen_mlen[#unaligned 0];
 
     if (ctxlen <= 255) {
         #spill(ctxlen_mlen, ctx_m, ctxlen, verification_key, signature);
@@ -61,22 +61,22 @@ inline fn __verify_internal(
         ptr_to_xof_state = _hash_verification_key(ptr_to_xof_state, verification_key);
 
         #unspill(ctxlen_mlen);
-        ptr_to_xof_state = __add_message_prefix(ptr_to_xof_state, ctxlen_mlen[0], VERIFICATION_KEY_HASH_SIZE);
+        ptr_to_xof_state = __add_message_prefix(ptr_to_xof_state, ctxlen_mlen[#unaligned 0], VERIFICATION_KEY_HASH_SIZE);
         ptr_to_xof_state = __add_zero_after_add(ptr_to_xof_state, VERIFICATION_KEY_HASH_SIZE + 2);
         pos = VERIFICATION_KEY_HASH_SIZE + 2;
 
         #unspill(ctx_m);
-        ctx = ctx_m[0];
+        ctx = ctx_m[#unaligned 0];
         #spill(ctx_m);
 
         #unspill(ctxlen);
         ptr_to_xof_state, pos = _shake256_inc_absorb_mem_naive(ptr_to_xof_state, pos, ctx, ctxlen);
 
         #unspill(ctxlen_mlen);
-        mlen = ctxlen_mlen[1];
+        mlen = ctxlen_mlen[#unaligned 1];
 
         #unspill(ctx_m);
-        m = ctx_m[1];
+        m = ctx_m[#unaligned 1];
         ptr_to_xof_state, pos = _shake256_inc_absorb_mem_naive(ptr_to_xof_state, pos, m, mlen);
         ptr_to_xof_state = _shake256_add_block_end(ptr_to_xof_state, pos);
         ptr_to_xof_state = _keccakf1600_ref(ptr_to_xof_state);

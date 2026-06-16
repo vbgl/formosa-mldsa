@@ -43,7 +43,7 @@ inline fn __sign_internal(
 
     status = -1;
 
-    ctxlen = ctxlen_mlen[0];
+    ctxlen = ctxlen_mlen[#unaligned 0];
 
     if (ctxlen <= 255) {
         #spill(ctx_m_rand, sig, status, ctxlen, ctxlen_mlen, signing_key);
@@ -54,23 +54,23 @@ inline fn __sign_internal(
         pstate = __add_crh(pstate, signing_key[2 * SEEDBYTES : VERIFICATION_KEY_HASH_SIZE]); // VERIFICATION_KEY_HASH_SIZE = CRHBYTES
 
         #unspill(ctxlen_mlen);
-        t = ctxlen_mlen[0];
+        t = ctxlen_mlen[#unaligned 0];
 
         pstate = __add_message_prefix(pstate, t, VERIFICATION_KEY_HASH_SIZE);
         pstate = __add_zero_after_add_naive(pstate, VERIFICATION_KEY_HASH_SIZE + 2);
         pos = VERIFICATION_KEY_HASH_SIZE + 2;
 
         #unspill(ctx_m_rand);
-        ctx = ctx_m_rand[0];
+        ctx = ctx_m_rand[#unaligned 0];
 
         #unspill(ctxlen);
         pstate, pos = _shake256_inc_absorb_mem_naive(pstate, pos, ctx, ctxlen);
 
         #unspill(ctxlen_mlen);
-        mlen = ctxlen_mlen[1];
+        mlen = ctxlen_mlen[#unaligned 1];
 
         #unspill(ctx_m_rand);
-        m = ctx_m_rand[1];
+        m = ctx_m_rand[#unaligned 1];
 
         pstate, pos = _shake256_inc_absorb_mem_naive(pstate, pos, m, mlen);
         pstate = _shake256_add_block_end(pstate, pos);
@@ -85,7 +85,7 @@ inline fn __sign_internal(
 
         rnd = state.[:u8 SEEDBYTES : RNDBYTES];
         #unspill(ctx_m_rand);
-        randomness_ptr = ctx_m_rand[2];
+        randomness_ptr = ctx_m_rand[#unaligned 2];
         for i = 0 to RNDBYTES/4 {
             t = [:u32 randomness_ptr + 4*i];
             rnd[:u32 i] = t;

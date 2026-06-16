@@ -69,7 +69,7 @@ export fn ml_dsa_65_sign(
     _ = #init_msf();
 
     reg u64 result;
-    reg u64 context_size = context_message_sizes[0];
+    reg u64 context_size = context_message_sizes[#unaligned 0];
 
     if (context_size <= 255) {
         signature = __sign_internal(signature, signing_key, context_message_pointers, context_message_sizes, randomness);
@@ -96,7 +96,7 @@ export fn ml_dsa_65_verify(
     reg u64 verification_result;
 
     _ = #init_msf();
-    reg u64 context_size = context_message_sizes[0];
+    reg u64 context_size = context_message_sizes[#unaligned 0];
 
     if (context_size <= 255) {
         verification_result = __verify_internal(verification_key, context_message_pointers, context_message_sizes, signature);

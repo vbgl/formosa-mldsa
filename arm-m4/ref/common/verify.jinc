@@ -36,7 +36,7 @@ fn _crypto_sign_verify_ctx(
 
     inline int i;
 
-    ctxlen = ctxlen_mlen[0];
+    ctxlen = ctxlen_mlen[#unaligned 0];
 
     if (ctxlen <= 255) {
         #spill(ctxlen_mlen, ctx_m, ctxlen);
@@ -64,7 +64,7 @@ fn _crypto_sign_verify_ctx(
                 message_prefix = crh_byte_hash[0 : 2];
                 t = 0;
                 message_prefix[0] = (8u)t;
-                t = ctxlen_mlen[0];
+                t = ctxlen_mlen[#unaligned 0];
                 message_prefix[1] = (8u)t;
                 crh_byte_hash[0 : 2] = message_prefix;
 
@@ -73,13 +73,13 @@ fn _crypto_sign_verify_ctx(
                 #spill(message_prefix);
                 pstate = __add_zero_after_add_naive(pstate, VERIFICATION_KEY_HASH_SIZE + 2);
                 pos = VERIFICATION_KEY_HASH_SIZE + 2;
-                ctx = ctx_m[0];
+                ctx = ctx_m[#unaligned 0];
                 #spill(ctx_m, ctxlen_mlen);
                 #unspill(ctxlen);
                 pstate, pos = _shake256_inc_absorb_mem_naive(pstate, pos, ctx, ctxlen);
                 #unspill(ctx_m, ctxlen_mlen);
-                mlen = ctxlen_mlen[1];
-                m = ctx_m[1];
+                mlen = ctxlen_mlen[#unaligned 1];
+                m = ctx_m[#unaligned 1];
                 pstate, pos = _shake256_inc_absorb_mem_naive(pstate, pos, m, mlen);
                 pstate = _shake256_add_block_end(pstate, pos);
                 pstate = _keccakf1600_ref(pstate);
