@@ -11,6 +11,7 @@ inline fn copy_polyvecl(reg ptr u32[polyvecl] s1hat, reg ptr u32[polyvecl] s1) -
 }
 
 #[ct = "public * _ * _ -> _ * _"]
+#[large_stack]
 fn _crypto_sign_keypair_seed(
     reg ptr u8[VERIFICATION_KEY_SIZE] pk,
     reg ptr u8[SIGNING_KEY_SIZE] sk,
