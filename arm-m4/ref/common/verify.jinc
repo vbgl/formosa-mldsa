@@ -11,6 +11,7 @@
  *
  * Returns 0 if signature could be verified correctly and -1 otherwise
  **************************************************/
+#[large_stack]
 fn _crypto_sign_verify_ctx(
         reg ptr u8[SIGNATURE_SIZE] sig,
         reg ptr u32[2] ctx_m,
