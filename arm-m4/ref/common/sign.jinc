@@ -33,6 +33,7 @@ fn _shake256_inc_absorb_mem_naive
 }
 
 #[ct = "public * _ * _ * secret -> public * _"]
+#[large_stack]
 fn _crypto_sign_signature_ctx_seed(
     reg ptr u8[SIGNATURE_SIZE] sig,
     reg ptr u32[3] ctx_m_rand,
