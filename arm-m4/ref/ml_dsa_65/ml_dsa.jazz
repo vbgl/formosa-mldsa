@@ -60,6 +60,7 @@ export fn ml_dsa_65_sign(
 }
 
 #[ct = "public * public * public * public -> public"]
+#[large_stack]
 export fn ml_dsa_65_verify(
     reg ptr u8[SIGNATURE_SIZE] sig,
     reg ptr u32[2] ctx_m,
